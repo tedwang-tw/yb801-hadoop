@@ -91,12 +91,19 @@ public class TFIDF extends Configured implements Tool {
 			}// end of for-loop for getting value from input Text
 			
 			List<String> wordInf = MRTools.getWordInf(wordsInf);
+		// line 94~97 for printing tf*idf only
+			String finalvalue = MRTools.getTogetherTFIDF(wordInf);
+
+			context.write(new Text(key),new Text(finalvalue));
+		/*
+		// print metadata in output data
 			Iterator<String> iterator = wordInf.iterator();
 			
 			while(iterator.hasNext()) {
 				String finalvalue = iterator.next();
 				context.write(new Text(key),new Text(finalvalue));
 			}// end of while-loop for output
+		*/
 		}// end of method reduce()
 	}// end of inner class TFIDFReducer
 
