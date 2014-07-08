@@ -101,7 +101,7 @@ public class MRTools {
 	public static String getTogetherTFIDF(List<String> wordInf) {
 		
 		String[] metadata = new String[wordInf.size()];
-		String finalvalue = "";
+		String finalvalue = ":";
 		Iterator<String> iterator = wordInf.iterator();
 		
 		while(iterator.hasNext()) {
@@ -111,10 +111,10 @@ public class MRTools {
 		}// end of while-loop for get together tfidf values
 
 		for(int i=0;i<metadata.length-1;i++) {
-			finalvalue = finalvalue + metadata[i] + ",";
+			finalvalue = finalvalue.concat(metadata[i]).concat(",");
 		}// end of for-loop for output data
 		
-		finalvalue = finalvalue + metadata[metadata.length-1];
+		finalvalue =  finalvalue.concat(metadata[metadata.length-1]);
 		
 		return finalvalue;
 	}// end of method getTogetherTFIDF()
