@@ -26,7 +26,7 @@ public class ClassificationTFIDF extends Configured implements Tool {
 		
 		if(job==null) { return -1;}
 
-		DistributedCache.addCacheFile(new URI("input/side-data/keywords_merge.txt"),job.getConfiguration());	// use files on hdfs
+		DistributedCache.addCacheFile(new URI("input/side-data/keywords_merge_test"),job.getConfiguration());	// use files on hdfs
 
 		FileInputFormat.addInputPath(job,new Path(args[0]));		// input path
 		FileOutputFormat.setOutputPath(job,new Path(args[1]));		// output path
