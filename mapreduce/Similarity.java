@@ -10,12 +10,10 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.Partitioner;
 import org.apache.hadoop.filecache.DistributedCache;
-import org.apache.hadoop.mapred.*;
 
-public class DXD_test extends Configured implements Tool {
+public class Similarity extends Configured implements Tool {
 
 	// static Variables
 	static double[][] localDocVector; // Setup DistributeCache File and get
@@ -73,6 +71,7 @@ public class DXD_test extends Configured implements Tool {
 			return docVector;
 		}// end of method localDoc()
 
+		@SuppressWarnings("deprecation")
 		@Override
 		protected void setup(Context context) throws IOException,
 				InterruptedException {
@@ -147,16 +146,17 @@ public class DXD_test extends Configured implements Tool {
 
 	// Main
 	public static void main(String[] args) throws Exception {
-		int exitCode = ToolRunner.run(new DXD_test(), args);
+		int exitCode = ToolRunner.run(new Similarity(), args);
 		System.exit(exitCode);
 	}// end of main
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public int run(String[] args) throws Exception {
 		Configuration conf = new Configuration();
 
 		Job job = new Job(conf, "DxD_test");
-		job.setJarByClass(DXD_test.class);
+		job.setJarByClass(Similarity.class);
 
 		DistributedCache.addCacheFile(new URI("input/tfidf.txt"),
 				job.getConfiguration()); 				// use files on hdfs
