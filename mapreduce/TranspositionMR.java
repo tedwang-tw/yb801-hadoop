@@ -77,29 +77,7 @@ public class TranspositionMR extends Configured implements Tool {
 			for(i=0;i<metadataArray.length;i++) {
 				sb.append(":").append(metadataArray[i]);
 			}// end of for-loop for output data
-			
-			
-		/*	
-			Set<String> metadata = new TreeSet<String>();			
-			StringBuilder sb = new StringBuilder(300);
-			
-			for(Text value : values) {
-				metadata.add(value.toString());
-			}// end of for-loop for getting value
-			
-			String[] sortedArray = new String[metadata.size()];
-			Object[] tempArray = metadata.toArray();
-			
-			for(int i=0;i>tempArray.length;i++) {
-				sortedArray[i] = tempArray[i].toString();
-			}// end of for-loop for sorting
-			
-			String arrayString = Arrays.toString(sortedArray);
-			
-			for(int i=0;i<sortedArray.length;i++) {
-				sb.append(":").append(sortedArray[i]);
-			}// end of for-loop for output data
-		*/	
+
 			context.write(key,new Text(sb.toString()));
 		}// end of method reduce()
 	}// end of inner class TranspositionReducer
