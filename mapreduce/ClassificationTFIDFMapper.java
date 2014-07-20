@@ -15,24 +15,21 @@ import org.apache.hadoop.mapreduce.Mapper;
 
 public class ClassificationTFIDFMapper extends Mapper<LongWritable,Text,Text,Text> {
 	
+	protected static int mapCount = 0;
 	protected Map<String,String> keyWords = new HashMap<String,String>();		// key words
-
-//	@Override
-//	protected void cleanup(Context context) throws IOException,InterruptedException { DistributedCache.purgeCache(conf);};
-//	DistributedCache.purgeCache(conf);
-
 	@Override
 	protected void setup(Context context) throws IOException, InterruptedException {
-
 		@SuppressWarnings("deprecation")
 		Path[] paths = DistributedCache.getLocalCacheFiles(context.getConfiguration());		// set path for distributed cache data
 		String str;
+		BufferedReader buf;
 
 		try {
-			BufferedReader buf = new BufferedReader(new FileReader(paths[0].toString()));
+			buf = new BufferedReader(new FileReader(paths[0].toString()));
 
 			while((str=buf.readLine()) != null) {
-				keyWords.put(str,str);
+				String[] strinf = str.split(",");
+				keyWords.put(strinf[1],strinf[0]);
 			}// end of while-loop for putting value to keyWords
 
 			buf.close();
@@ -40,37 +37,48 @@ public class ClassificationTFIDFMapper extends Mapper<LongWritable,Text,Text,Tex
 			System.out.println("IOException in reading distributed cache data" + e.toString());
 			System.exit(-1);
 		}// end of try-catch for IOException
+		
+		str = null;
+		paths = null;
+		
 	}// end of method setup()
-
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void map(LongWritable key,Text value,Context context) throws IOException, InterruptedException {
 
 		String[] valueString = value.toString().split(",");
 
-		Set setKW = (Set)keyWords.entrySet();
-		Iterator iteratorKW = setKW.iterator();
+	//	Set setKW = (Set)keyWords.entrySet();
+		Iterator iteratorKW =((Set)keyWords.entrySet()).iterator();
+		StringBuilder sb = new StringBuilder();
 		
 		while(iteratorKW.hasNext()) {
 			Entry entry = (Entry)iteratorKW.next();
-			String k = (String)entry.getKey();
-		/*	
-			String v = (String)entry.getValue();
-			String rv = v.concat(",").concat(valueString[0]).concat(",0,0");
-		*/	
-			String rv = valueString[0].concat(",0,0");
-			keyWords.put(k,rv);
+			sb.append((String)entry.getValue()).append(",").append(valueString[0]).append(",0");
+			keyWords.put((String)entry.getKey(),sb.toString());
+			sb.delete(0,sb.length());
 		}// end of while-loop for set keyWords
 
 		Map<String,String> jobInf = MRTools.getJobInf(valueString,keyWords);
-		Set set = (Set)jobInf.entrySet();
-		Iterator iterator = set.iterator();
+	//	Set set = (Set)jobInf.entrySet();
+		Iterator iterator = ((Set)jobInf.entrySet()).iterator();
 
 		while(iterator.hasNext()) {
 			Entry entry = (Entry)iterator.next();
-			String keyWord = (String)entry.getKey();
-			String valueInf = (String)entry.getValue();
-			context.write(new Text(keyWord),new Text(valueInf));
+			context.write(new Text((String)entry.getKey()),new Text((String)entry.getValue()));
 		}// end of while-loop for output
+		
+		valueString = null;
+		iteratorKW = null;
+		jobInf = null;
+		iterator = null;
+		sb = null;
+		
+		mapCount ++;
+		
+		if(mapCount%1000==0){
+			System.gc();
+		}
+		
 	}// end of method map()	
 }// end of class ClassificationTFMapper

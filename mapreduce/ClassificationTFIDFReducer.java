@@ -23,5 +23,10 @@ public class ClassificationTFIDFReducer extends Reducer<Text,Text,Text,Text> {
 		}// end of for-loop for output
 		
 		context.write(new Text(key),new Text(sb.toString()));
+		
+		wordsInf = null;
+		wordInf = null;
+		sb = null;
+		
 	}// end of method reduce()
 }// end of class ClassificationIDFReducer
