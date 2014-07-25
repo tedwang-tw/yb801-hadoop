@@ -10,7 +10,7 @@ import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
-public class SimilarityETLMR extends Configured implements Tool {
+public class SimilarityETL extends Configured implements Tool {
 
 	public static int keyNum;
 	
@@ -92,7 +92,7 @@ public class SimilarityETLMR extends Configured implements Tool {
 
 		Configuration conf = new Configuration();	
 		Job job = new Job(conf,"ETL before Similarity");			// create a job for mapreduce by using the configuration
-		job.setJarByClass(SimilarityETLMR.class);				// set class name 
+		job.setJarByClass(SimilarityETL.class);				// set class name 
 		
 		if(job==null) { return -1;}
 
@@ -113,7 +113,7 @@ public class SimilarityETLMR extends Configured implements Tool {
 	}// end of method run()
 	
 	public static void main(String[] args) throws Exception {
-		int exitCode = ToolRunner.run(new SimilarityETLMR(),args);
+		int exitCode = ToolRunner.run(new SimilarityETL(),args);
 		System.exit(exitCode);
 	}// end of method main()
 }// end of class SimilarityETLMR

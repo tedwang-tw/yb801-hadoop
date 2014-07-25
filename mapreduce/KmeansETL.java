@@ -10,11 +10,11 @@ import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
-public class TranspositionMR extends Configured implements Tool {
+public class KmeansETL extends Configured implements Tool {
 
 	public static int keyNum;
 	
-	static class TranspositionMapper extends Mapper<LongWritable,Text,IntWritable,Text> {
+	static class KmeansETLMapper extends Mapper<LongWritable,Text,IntWritable,Text> {
 		@Override
 		public void map(LongWritable key,Text value,Context context) throws IOException, InterruptedException {
 			
@@ -29,9 +29,9 @@ public class TranspositionMR extends Configured implements Tool {
 				context.write(new IntWritable(Integer.parseInt(inInf[0])),new Text(outputInf));
 			}// end of for-loop for setting output key-value for method map()
 		}// end of method map()	
-	}// end of inner class TranspositionMapper	
+	}// end of inner class KmeansETLMapper	
 	
-	static class TranspositionPartitioner extends Partitioner<IntWritable,Text>{
+	static class KmeansETLPartitioner extends Partitioner<IntWritable,Text>{
 		
 		public void setKeyNum(int num) { keyNum = num;}
 		
@@ -49,14 +49,13 @@ public class TranspositionMR extends Configured implements Tool {
 
 			return (result != -1) ? result : reducerNum - 1;		
 		}// end of method getPartition()
-	}// end of class TranspositionPartitioner
+	}// end of class KmeansETLPartitioner
 	
-	static class TranspositionReducer extends Reducer<IntWritable,Text,IntWritable,Text> {
+	static class KmeansETLReducer extends Reducer<IntWritable,Text,IntWritable,Text> {
 		@Override
 		public void reduce(IntWritable key,Iterable<Text> values,Context context) throws IOException,InterruptedException {
 		
 			Set<String> metadata = new HashSet<String>();
-			StringBuilder sb = new StringBuilder(300);
 			
 			for(Text value : values) {
 				metadata.add(value.toString());
@@ -74,14 +73,20 @@ public class TranspositionMR extends Configured implements Tool {
 			
 			Arrays.sort(metadataArray);
 			
-			for(i=0;i<metadataArray.length;i++) {
-				sb.append(":").append(metadataArray[i]);
-			}// end of for-loop for output data
+			StringBuilder sb = new StringBuilder(300);
 
-			context.write(key,new Text(sb.toString()));
+			for(i=0;i<metadataArray.length;i++) {
+				String[] outputValue = metadataArray[i].split(","); 
+			//	if(i==0)
+			//		sb.append(outputValue[0]).append(":").append(outputValue[2]);
+			//	else
+					sb.append(",").append(outputValue[0]).append(":").append(outputValue[2]);
+			}// end of for-loop for output data
+			
+			context.write(new IntWritable(Integer.parseInt(key.toString())),new Text(sb.toString()));	
 		}// end of method reduce()
-	}// end of inner class TranspositionReducer
-	@SuppressWarnings({ "unused", "deprecation" })
+	}// end of inner class SimilarityETLReducer
+	@SuppressWarnings({"unused","deprecation"})
 	@Override
 	public int run(String[] args) throws URISyntaxException,IOException,InterruptedException,ClassNotFoundException {
 	
@@ -91,8 +96,8 @@ public class TranspositionMR extends Configured implements Tool {
 		}
 
 		Configuration conf = new Configuration();	
-		Job job = new Job(conf,"Transposition");			// create a job for mapreduce by using the configuration
-		job.setJarByClass(TranspositionMR.class);				// set class name 
+		Job job = new Job(conf,"ETL before  Kmeans cluster");		// create a job for mapreduce by using the configuration
+		job.setJarByClass(KmeansETL.class);						// set class name 
 		
 		if(job==null) { return -1;}
 
@@ -102,18 +107,18 @@ public class TranspositionMR extends Configured implements Tool {
 	//  job.setNumMapTasks(5);		// set number of mapper	(?)
 	//	job.setNumReduceTasks(2);	// set number of reducer
 	
-		job.setMapperClass(TranspositionMapper.class);					// set mapper
-		job.setPartitionerClass(TranspositionPartitioner.class);		// set partitioner
-		job.setReducerClass(TranspositionReducer.class);				// set reducer
+		job.setMapperClass(KmeansETLMapper.class);					// set mapper
+		job.setPartitionerClass(KmeansETLPartitioner.class);		// set partitioner
+		job.setReducerClass(KmeansETLReducer.class);				// set reducer
 
-		job.setOutputKeyClass(IntWritable.class);
-		job.setOutputValueClass(Text.class);
-		
+		job.setMapOutputKeyClass(IntWritable.class);
+		job.setMapOutputValueClass(Text.class);		
+			
 		return job.waitForCompletion(true)?0:1;
 	}// end of method run()
 	
 	public static void main(String[] args) throws Exception {
-		int exitCode = ToolRunner.run(new TranspositionMR(),args);
+		int exitCode = ToolRunner.run(new KmeansETL(),args);
 		System.exit(exitCode);
 	}// end of method main()
-}// end of class Transposition
+}// end of class KmeansETLMR
