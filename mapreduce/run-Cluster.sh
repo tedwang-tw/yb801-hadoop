@@ -8,12 +8,12 @@ hdfs dfs -D dfs.blocksize=1048576 -put input/keywords_merge_sort_index.txt input
 
 #---------------------------------------------
 #Setting hadoop
-export HADOOP_OPTS="$HADOOP_OPTS -Xmx4G"
+#export HADOOP_OPTS="$HADOOP_OPTS -Xmx4G"
 
 #---------------------------------------------
 #Doing Cluster TFIDF
-hdfs dfs -rmr output/cluster-tfidf
-hadoop jar Cluster.jar ClusterTFIDF input/jobword_merge.txt output/cluster-tfidf
+#hdfs dfs -rmr output/cluster-tfidf
+#hadoop jar Cluster.jar ClusterTFIDF input/jobword_merge.txt output/cluster-tfidf
 
 #---------------------------------------------
 #Doing Similarity
