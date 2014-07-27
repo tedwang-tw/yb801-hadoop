@@ -8,7 +8,7 @@ hdfs dfs -D dfs.blocksize=1048576 -put input/keywords_merge_sort_index.txt input
 
 #---------------------------------------------
 #Setting hadoop
-#export HADOOP_OPTS="$HADOOP_OPTS -Xmx4G"
+export HADOOP_OPTS="$HADOOP_OPTS -Xmx4G"
 
 #---------------------------------------------
 #Doing Cluster TFIDF
